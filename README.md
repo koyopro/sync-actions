@@ -19,7 +19,7 @@ By passing asynchronous functions to `defineSyncWorker()`, you define the interf
 
 
 ```typescript
-// worker.ts
+// worker.js
 import { defineSyncWorker } from "sync-actions";
 
 export const { actions, worker } = defineSyncWorker(import.meta.filename, {
@@ -33,11 +33,11 @@ export const { actions, worker } = defineSyncWorker(import.meta.filename, {
 ```
 
 ```typescript
-// main.ts
-import { actions, worker } from "./worker.ts";
+// main.js
+import { actions, worker } from "./worker.js";
 
 // You can execute asynchronous functions synchronously
-actions.ping(); // => "pong" is returned after 1 second
+console.log(actions.ping()); // => "pong" is returned after 1 second
 
 worker.terminate();
 ```
@@ -60,7 +60,7 @@ export const { actions, worker } = defineSyncWorker(import.meta.filename, {
 
 ```typescript
 // main.ts
-import { actions, worker } from "./worker.ts";
+import { actions, worker } from "./worker.js";
 
 // Type-safe call
 actions.add(1, 2); // => 3 (number)
@@ -77,8 +77,8 @@ worker.terminate();
 To confirm that the worker thread has started, you can wait for `ready` to be sent with `worker.once('message')`. You can also catch errors if they occur with `worker.once('error')`.
 
 ```typescript
-// main.ts
-import { worker } from "./worker.ts";
+// main.js
+import { worker } from "./worker.js";
 
 worker.once('message', (message) => {
   if (message === 'ready') {
