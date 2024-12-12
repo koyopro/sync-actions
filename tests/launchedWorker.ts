@@ -1,5 +1,5 @@
-import { launchSyncWorker } from "../dist/index";
+import { defineSyncWorker } from "../dist/index";
 
-export const { actions, getWorker, stopWorker } = launchSyncWorker(import.meta.filename, {
+export const { actions, worker } = defineSyncWorker(import.meta.filename, {
   ping: () => "pong!?",
-});
+}).launch();

@@ -1,6 +1,6 @@
-import { actions, getWorker } from "./launchedWorker";
+import { actions, worker } from "./launchedWorker";
 
 test("sync actinos", () => {
   expect(actions.ping()).toBe("pong!?");
-  getWorker()!.terminate();
+  worker.terminate();
 });

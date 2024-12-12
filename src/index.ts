@@ -19,20 +19,11 @@ export type Client<F extends Actions> = { [K in keyof F]: AwaitedFunc<F, K> };
 
 const isSubThread = workerData?.subThreadForSync === true;
 
-export const launchSyncWorker = <F extends Actions>(filename: string, actions: F) => {
-  const { launch, ...client } = defineSyncWorker(filename, actions);
-  return {
-    actions: launch(),
-    ...client,
-  };
-};
-
 export const defineSyncWorker = <F extends Actions>(filename: string, actions: F) => {
   useAction(actions);
   // Parent thread
-  let worker: Worker | null = null;
   return {
-    launch: (): Client<F> => {
+    launch: (): { actions: Client<F>, worker: Worker } => {
       if (isSubThread || process.env.DISABLE_SYNC_ACTIONS) return {} as any;
 
       const sharedBuffer = new SharedArrayBuffer(4);
@@ -41,19 +32,17 @@ export const defineSyncWorker = <F extends Actions>(filename: string, actions: F
       const tmpfile = makeTmpFilePath(filename);
       buildFile(filename, tmpfile);
 
-      worker = new Worker(tmpfile, {
+      const worker = new Worker(tmpfile, {
         workerData: { sharedBuffer, workerPort, subThreadForSync: true },
         transferList: [workerPort],
       });
-      return buildClient(worker, sharedBuffer, mainPort) as any;
-    },
+      const actions = buildClient(worker, sharedBuffer, mainPort) as any;
 
-    stopWorker: () => {
-      worker?.terminate();
-      worker = null;
+      return {
+        actions,
+        worker,
+      }
     },
-
-    getWorker: () => worker,
   };
 };
 

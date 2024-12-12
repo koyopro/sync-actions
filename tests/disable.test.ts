@@ -1,8 +1,8 @@
-import actions from "./worker";
+import syncWorker from "./worker";
 
 test("DISABLE_SYNC_ACTIONS env", () => {
   process.env.DISABLE_SYNC_ACTIONS = "true";
-  const client = actions.launch();
-  expect(client.ping).toBe(undefined);
+  const client = syncWorker.launch();
+  expect(client.actions).toBe(undefined);
   process.env.DISABLE_SYNC_ACTIONS = undefined;
 })
