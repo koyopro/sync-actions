@@ -31,9 +31,8 @@
   ],
   "author": "koyopro",
   "license": "MIT",
-  "dependencies": {
-  },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "vitest": "^2.0.0"
   }
 }
