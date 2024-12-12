@@ -19,18 +19,46 @@ export type Client<F extends Actions> = { [K in keyof F]: AwaitedFunc<F, K> };
 
 const isSubThread = workerData?.subThreadForSync === true;
 
-export const defineSyncWorker = <F extends Actions>(filename: string, actions: F) => {
+/**
+ * Defines a synchronous worker with the given filename and actions.
+ *
+ * @param filepath - The filepath of the worker script.
+ * @param actions - The actions to be used by the worker.
+ *
+ * The `launch` method returns an object containing:
+ * - `actions`: The client actions that communicate with the worker.
+ * - `worker`: The Worker instance.
+ * 
+ * @example
+ * 
+ * ```ts
+ * import { defineSyncWorker } from "sync-actions";
+ * 
+ * export const { actions, worker } = defineSyncWorker(import.meta.filename, {
+ *   ping: async () => {
+ *     // Execute some asynchronous process,
+ *     await new Promise((resolve) => setTimeout(resolve, 1000));
+ *     // Return the result as a return value
+ *     return "pong";
+ *   }
+ * }).launch();
+ * ```
+ */
+export const defineSyncWorker = <F extends Actions>(filepath: string, actions: F) => {
   useAction(actions);
   // Parent thread
   return {
+    /**
+     * Launches the worker and returns the client actions and the worker instance.
+     */
     launch: (): { actions: Client<F>, worker: Worker } => {
       if (isSubThread || process.env.DISABLE_SYNC_ACTIONS) return {} as any;
 
       const sharedBuffer = new SharedArrayBuffer(4);
       const { port1: mainPort, port2: workerPort } = new MessageChannel();
 
-      const tmpfile = makeTmpFilePath(filename);
-      buildFile(filename, tmpfile);
+      const tmpfile = makeTmpFilePath(filepath);
+      buildFile(filepath, tmpfile);
 
       const worker = new Worker(tmpfile, {
         workerData: { sharedBuffer, workerPort, subThreadForSync: true },
