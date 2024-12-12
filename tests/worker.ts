@@ -1,5 +1,5 @@
 import { FileHandle } from "fs/promises";
-import { defineSyncWorker } from "../src/index";
+import { defineSyncWorker } from "../dist/index";
 
 export class MyError extends Error {
   name = "MyError";
