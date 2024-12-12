@@ -1,0 +1,39 @@
+{
+  "name": "sync-actions",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "test": "vitest --typecheck"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koyopro/sync-actions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koyopro/sync-actions/issues"
+  },
+  "homepage": "https://github.com/koyopro/sync-actions",
+  "keywords": [
+    "synchronize",
+    "worker_threads",
+    "sync",
+    "sync-actions"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "dist"
+  ],
+  "author": "koyopro",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  }
+}
