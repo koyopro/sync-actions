@@ -52,7 +52,7 @@ import { defineSyncWorker } from "sync-actions";
 
 export const { actions, worker } = defineSyncWorker(import.meta.filename, {
   // By specifying the types of arguments and return values, type-safe calls are possible
-  add: async (a: number, b: number): number => {
+  add: async (a: number, b: number): Promise<number> => {
     return a + b;
   }
 }).launch();
