@@ -2,7 +2,7 @@
   "name": "sync-actions",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "A library for synchronously executing asynchronous operations with type-safe calls.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
