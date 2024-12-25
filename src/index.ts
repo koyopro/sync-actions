@@ -19,6 +19,8 @@ export type Client<F extends Actions> = { [K in keyof F]: AwaitedFunc<F, K> };
 
 const isSubThread = workerData?.subThreadForSync === true;
 
+let workers = [] as Worker[];
+
 /**
  * Defines a synchronous worker with the given filename and actions.
  *
@@ -64,6 +66,7 @@ export const defineSyncWorker = <F extends Actions>(filepath: string, actions: F
         workerData: { sharedBuffer, workerPort, subThreadForSync: true },
         transferList: [workerPort],
       });
+      workers.push(worker);
       const actions = buildClient(worker, sharedBuffer, mainPort) as any;
 
       return {
@@ -73,6 +76,16 @@ export const defineSyncWorker = <F extends Actions>(filepath: string, actions: F
     },
   };
 };
+
+/**
+ * Terminates all worker threads.
+ *
+ * This function asynchronously terminates all worker threads by calling the `terminate` method.
+ *
+ * @returns A Promise that resolves to an array of exit codes for each worker.
+ */
+export const terminateAllThreads = async (): Promise<(number | undefined)[]> =>
+  Promise.all(workers.map((worker) => worker.terminate()));
 
 const makeTmpFilePath = (filename: string) => {
   const md5 = createHash("md5").update(filename).digest("hex");
