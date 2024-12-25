@@ -92,6 +92,15 @@ worker.once('error', (error) => {
 });
 ```
 
+### Terminating All Threads
+By calling `terminateAllThreads()`, you can terminate all worker threads that have been started with `launch()`. The return value is an array of exit codes.
+
+```typescript
+import { terminateAllThreads } from "sync-actions";
+
+const exitCodes = await terminateAllThreads();
+```
+
 ## Environment Variables
 
 ### `DISABLE_SYNC_ACTIONS`
