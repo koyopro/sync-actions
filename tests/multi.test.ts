@@ -1,4 +1,4 @@
-import { terminateAllThreads } from "../src";
+import { terminateAllWorkers } from "../src";
 import actions from "./worker";
 
 
@@ -12,13 +12,13 @@ test("launch multiple workers", async () => {
   client2.worker.terminate();
 });
 
-test("terminateAllThreads()", async () => {
+test("terminateAllWorkers()", async () => {
   const client1 = actions.launch();
   const client2 = actions.launch();
   const client3 = actions.launch();
   expect(await client3.worker.terminate()).toBe(0)
 
-  await terminateAllThreads();
+  await terminateAllWorkers();
 
   // all threads are already terminated
   expect(await client1.worker.terminate()).toBeUndefined();

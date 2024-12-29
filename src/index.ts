@@ -84,7 +84,7 @@ export const defineSyncWorker = <F extends Actions>(filepath: string, actions: F
  *
  * @returns A Promise that resolves to an array of exit codes for each worker.
  */
-export const terminateAllThreads = async (): Promise<(number | undefined)[]> =>
+export const terminateAllWorkers = async (): Promise<(number | undefined)[]> =>
   Promise.all(workers.map((worker) => worker.terminate()));
 
 const makeTmpFilePath = (filename: string) => {
