@@ -16,7 +16,11 @@ test("sync actinos", async () => {
   try {
     actions.myErrorTest();
   } catch (e) {
-    expect(e).toMatchObject({ name: "MyError", message: "myErrorTest", prop1: "foo" });
+    expect(e).toMatchObject({
+      name: "MyError",
+      message: "myErrorTest",
+      prop1: "foo",
+    });
   }
 });
 
@@ -44,7 +48,10 @@ test("sync actinos with error", async () => {
   const { worker } = fail.launch();
   await new Promise<void>((resolve) => {
     worker.on("error", (error) => {
-      expect(error).toMatchObject({ message: "Sample error on launching worker." });
+      expect(error).toMatchObject({
+        message: "Sample error on launching worker.",
+        code: "SAMPLE_ERROR",
+      });
       resolve();
     });
   });
