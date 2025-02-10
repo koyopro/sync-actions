@@ -109,7 +109,7 @@ const buildClient = (worker: Worker, sharedBuffer: SharedArrayBuffer, mainPort: 
           const { result, error, properties } = receiveMessageOnPort(mainPort)?.message || {};
           Atomics.store(sharedArray, 0, 0);
           if (error) {
-            throw Object.assign(error as object, properties);
+            throw Object.assign(new Error(error), properties);
           }
           return result;
         };
@@ -127,8 +127,8 @@ const useAction = (actions: Actions) => {
       const ret = await actions[mgs.method]?.(...(mgs.args ?? []));
       const transferList = isTransferable(ret) ? [ret] : [];
       workerData.workerPort.postMessage({ result: ret }, transferList);
-    } catch (e) {
-      workerData.workerPort.postMessage({ error: e, properties: extractProperties(e) });
+    } catch (e: any) {
+      workerData.workerPort.postMessage({ error: e.message, properties: extractProperties(e) });
     }
     Atomics.store(sharedArray, 0, 1);
     Atomics.notify(sharedArray, 0, 1);
