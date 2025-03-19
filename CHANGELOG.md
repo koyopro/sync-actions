@@ -1,5 +1,9 @@
 # Sync Actions
 
+## 1.2.0
+
+- Add: SYNC_ACTIONS_TEMP_DIR environment variable
+
 ## 1.1.1
 
 - Changed the way error objects are created
