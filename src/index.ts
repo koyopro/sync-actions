@@ -30,12 +30,12 @@ let workers = [] as Worker[];
  * The `launch` method returns an object containing:
  * - `actions`: The client actions that communicate with the worker.
  * - `worker`: The Worker instance.
- * 
+ *
  * @example
- * 
+ *
  * ```ts
  * import { defineSyncWorker } from "sync-actions";
- * 
+ *
  * export const { actions, worker } = defineSyncWorker(import.meta.filename, {
  *   ping: async () => {
  *     // Execute some asynchronous process,
@@ -46,14 +46,17 @@ let workers = [] as Worker[];
  * }).launch();
  * ```
  */
-export const defineSyncWorker = <F extends Actions>(filepath: string, actions: F) => {
+export const defineSyncWorker = <F extends Actions>(
+  filepath: string,
+  actions: F
+) => {
   useAction(actions);
   // Parent thread
   return {
     /**
      * Launches the worker and returns the client actions and the worker instance.
      */
-    launch: (): { actions: Client<F>, worker: Worker } => {
+    launch: (): { actions: Client<F>; worker: Worker } => {
       if (isSubThread || process.env.DISABLE_SYNC_ACTIONS) return {} as any;
 
       const sharedBuffer = new SharedArrayBuffer(4);
@@ -72,7 +75,7 @@ export const defineSyncWorker = <F extends Actions>(filepath: string, actions: F
       return {
         actions,
         worker,
-      }
+      };
     },
   };
 };
@@ -88,15 +91,18 @@ export const terminateAllWorkers = async (): Promise<(number | undefined)[]> =>
   Promise.all(workers.map((worker) => worker.terminate()));
 
 const makeTmpFilePath = (filename: string) => {
-  const md5 = createHash("md5").update(filename).digest("hex");
-  return path.resolve(
-    process.cwd(),
-    "node_modules",
-    `.sync-action-workers/${path.basename(filename)}_${md5}.mjs`
-  );
+  const hash = createHash("sha256").update(filename).digest("hex");
+  const name = `${path.basename(filename)}_${hash}.mjs`;
+  const dir =
+    process.env.SYNC_ACTIONS_TEMP_DIR || `${process.cwd()}/node_modules`;
+  return path.resolve(dir, `.sync-action-workers/${name}`);
 };
 
-const buildClient = (worker: Worker, sharedBuffer: SharedArrayBuffer, mainPort: MessagePort) => {
+const buildClient = (
+  worker: Worker,
+  sharedBuffer: SharedArrayBuffer,
+  mainPort: MessagePort
+) => {
   const sharedArray = new Int32Array(sharedBuffer);
   return new Proxy(
     {},
@@ -106,7 +112,8 @@ const buildClient = (worker: Worker, sharedBuffer: SharedArrayBuffer, mainPort: 
           const transferList = args.filter((arg: any) => isTransferable(arg));
           worker.postMessage({ method: key, args }, transferList);
           Atomics.wait(sharedArray, 0, 0);
-          const { result, error, properties } = receiveMessageOnPort(mainPort)?.message || {};
+          const { result, error, properties } =
+            receiveMessageOnPort(mainPort)?.message || {};
           Atomics.store(sharedArray, 0, 0);
           if (error) {
             throw Object.assign(new Error(error), properties);
@@ -128,7 +135,10 @@ const useAction = (actions: Actions) => {
       const transferList = isTransferable(ret) ? [ret] : [];
       workerData.workerPort.postMessage({ result: ret }, transferList);
     } catch (e: any) {
-      workerData.workerPort.postMessage({ error: e.message, properties: extractProperties(e) });
+      workerData.workerPort.postMessage({
+        error: e.message,
+        properties: extractProperties(e),
+      });
     }
     Atomics.store(sharedArray, 0, 1);
     Atomics.notify(sharedArray, 0, 1);
@@ -176,6 +186,9 @@ const isTransferable = (obj: any): boolean => {
 
 function isFileHandle(obj: any): obj is FileHandle {
   return (
-    obj && typeof obj === "object" && typeof obj.fd === "number" && typeof obj.read === "function"
+    obj &&
+    typeof obj === "object" &&
+    typeof obj.fd === "number" &&
+    typeof obj.read === "function"
   );
 }
