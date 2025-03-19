@@ -91,12 +91,11 @@ export const terminateAllWorkers = async (): Promise<(number | undefined)[]> =>
   Promise.all(workers.map((worker) => worker.terminate()));
 
 const makeTmpFilePath = (filename: string) => {
-  const md5 = createHash("md5").update(filename).digest("hex");
-  return path.resolve(
-    process.cwd(),
-    "node_modules",
-    `.sync-action-workers/${path.basename(filename)}_${md5}.mjs`
-  );
+  const hash = createHash("sha256").update(filename).digest("hex");
+  const name = `${path.basename(filename)}_${hash}.mjs`;
+  const dir =
+    process.env.SYNC_ACTIONS_TEMP_DIR || `${process.cwd()}/node_modules`;
+  return path.resolve(dir, `.sync-action-workers/${name}`);
 };
 
 const buildClient = (

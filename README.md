@@ -107,6 +107,10 @@ const exitCodes = await terminateAllWorkers();
 
 By setting the environment variable to `DISABLE_SYNC_ACTIONS=1`, the worker will not be created even if `launch()` is executed. This can be used when you want to import the file that includes the execution of `launch()` but do not want to generate the thread.
 
+### `SYNC_ACTIONS_TEMP_DIR`
+
+Specifies the directory where temporary worker files are stored. By default, files are stored in `${process.cwd()}/node_modules`. You can change this location by setting this environment variable.
+
 ## License
 
 Copyright (c) 2024 koyopro
