@@ -1,5 +1,9 @@
 # Sync Actions
 
+## 1.3.0
+
+- Try executing with the original file if writing to tmp file fails
+
 ## 1.2.0
 
 - Add: SYNC_ACTIONS_TEMP_DIR environment variable
