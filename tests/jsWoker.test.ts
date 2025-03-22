@@ -21,9 +21,12 @@ test("should successfully launch and ping when no error occurs", async () => {
 
 test("should work correctly when buildSync encounters a write error", async () => {
   errorMessage = "Failed to create output directory: mkdir /var/task/node_modules/.sync-action-workers: read-only file system";
+  const originalWarn = console.warn;
+  console.warn = vi.fn();
   const { actions, worker } = client.launch();
   expect(actions.ping()).toBe("pong!?");
   worker.terminate();
+  console.warn = originalWarn;
 });
 
 test("should throw an error when buildSync fails with a non-write error", async () => {

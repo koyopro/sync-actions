@@ -90,6 +90,10 @@ const prepareExecuteFile = (filepath: string) => {
     ) {
       // When running in AWS Lambda, the file system is read-only, so writing may fail.
       // However, libraries might already be in a format executable by Node.js, so try running with the original file.
+      // Log a warning message when fallback to original file
+      console.warn(
+        `[sync-actions]: Failed to write compiled worker file. Falling back to original file: ${filepath}`
+      );
       return filepath;
     }
     throw e;
