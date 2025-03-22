@@ -62,10 +62,8 @@ export const defineSyncWorker = <F extends Actions>(
       const sharedBuffer = new SharedArrayBuffer(4);
       const { port1: mainPort, port2: workerPort } = new MessageChannel();
 
-      const tmpfile = makeTmpFilePath(filepath);
-      buildFile(filepath, tmpfile);
-
-      const worker = new Worker(tmpfile, {
+      const execPath = prepareExecuteFile(filepath);
+      const worker = new Worker(execPath, {
         workerData: { sharedBuffer, workerPort, subThreadForSync: true },
         transferList: [workerPort],
       });
@@ -78,6 +76,28 @@ export const defineSyncWorker = <F extends Actions>(
       };
     },
   };
+};
+
+const prepareExecuteFile = (filepath: string) => {
+  const tmpfile = makeTmpFilePath(filepath);
+  try {
+    buildFile(filepath, tmpfile);
+    return tmpfile;
+  } catch (e) {
+    if (
+      e instanceof Error &&
+      e.message.includes("read-only file system")
+    ) {
+      // When running in AWS Lambda, the file system is read-only, so writing may fail.
+      // However, libraries might already be in a format executable by Node.js, so try running with the original file.
+      // Log a warning message when fallback to original file
+      console.warn(
+        `[sync-actions]: Failed to write compiled worker file. Falling back to original file: ${filepath}`
+      );
+      return filepath;
+    }
+    throw e;
+  }
 };
 
 /**
